@@ -58,7 +58,7 @@
                                 <div class="form-group">
                                     <h5>SubCategory Select <span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                        <select name="subcategory_id" class="form-control" {{-- required=""  --}}>
+                                        <select name="subcategory_id" class="form-control" required="" >
                                             @foreach($subcategory as $sub)
                                                 <option value="{{ $sub->id }}" {{ $sub->id == $products->subcategory_id ? 'selected': '' }} >{{ $sub->subcategory_name_en }}</option>	
                                             @endforeach
@@ -76,7 +76,7 @@
                                 <div class="form-group">
                                     <h5>SubSubCategory Select <span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                        <select name="subsubcategory_id" class="form-control" {{-- required="" --}} >
+                                        <select name="subsubcategory_id" class="form-control" required="" >
                                             <option value="" selected="" disabled="">Select SubSubCategory</option>
                                             @foreach($subsubcategory as $subsub)
                                                 <option value="{{ $subsub->id }}" {{ $subsub->id == $products->subsubcategory_id ? 'selected': '' }} >{{ $subsub->subsubcategory_name_en }}</option>	
@@ -164,7 +164,7 @@
                                 <div class="form-group">
                                     <h5>Product Size Eng <span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                        <input type="text" name="product_size_en" data-role="tagsinput" placeholder="add tags" value="{{$products->product_size_en}}" required=""/>
+                                        <input type="text" name="product_size_en" data-role="tagsinput" placeholder="add tags" value="{{$products->product_size_en}}"/>
                                         @error('product_size_en') 
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror 
@@ -175,7 +175,7 @@
                                 <div class="form-group">
                                     <h5>Product Size Esp <span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                        <input type="text" name="product_size_esp" data-role="tagsinput" placeholder="add tags" value="{{$products->product_size_esp}}" required=""/>
+                                        <input type="text" name="product_size_esp" data-role="tagsinput" placeholder="add tags" value="{{$products->product_size_esp}}"/>
                                         @error('product_size_esp') 
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror 
@@ -225,7 +225,7 @@
                                 <div class="form-group">
                                     <h5>Product Discount Price <span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                        <input type="text" name="discount_price" class="form-control" value="{{$products->discount_price}}" required="">
+                                        <input type="text" name="discount_price" class="form-control" value="{{$products->discount_price}}">
                                         @error('discount_price') 
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror 

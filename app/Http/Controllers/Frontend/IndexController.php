@@ -10,14 +10,23 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Category;
 use App\Models\Slider;
 use App\Models\Product;
+use App\Models\MultiImg;
 
 class IndexController extends Controller
 {
     public function index(){
-        $products = Product::where('status','1')->orderBy('id','DESC')->get();
+        $products = Product::where('status','1')->orderBy('id','DESC')->limit(6)->get();
         $sliders = Slider::where('status','1')->orderBy('id','DESC')->limit(3)->get();
         $categories = Category::orderBy('category_name_en','ASC')->get();
-        return view('frontend.index', compact('categories','sliders','products'));
+        $featured = Product::where([['featured','1'],['status','1']])->orderBy('id','DESC')->limit(6)->get();
+        $hot_deals = Product::where([['hot_deals','1'],['status','1'],['discount_price','!=', NULL]])->orderBy('id','DESC')->limit(3)->get();
+        $special_offer = Product::where([['special_offer','1'],['status','1']])->orderBy('id','DESC')->limit(6)->get();
+        $special_deals = Product::where([['special_deals','1'],['status','1']])->orderBy('id','DESC')->limit(3)->get();
+        $skip_category_0 = Category::skip(0)->first();
+        $skip_product_0 = Product::where([['status','1'],['category_id',$skip_category_0->id]])->orderBy('id','DESC')->limit(3)->get();
+        /* return $skip_category->id;
+        die(); */
+        return view('frontend.index', compact('categories','sliders','products','featured','hot_deals','special_offer','special_deals','skip_category_0','skip_product_0'));
     }
 
     public function UserLogout(){
@@ -84,4 +93,68 @@ class IndexController extends Controller
             return redirect()->back()->with('error', 'Current Password is invalid');
         }
     }
+
+    public function ProductDetails($id,$slug){
+		$product = Product::findOrFail($id);
+
+        $color_en = $product->product_color_en;
+        $product_color_en = explode(',', $color_en);
+        $color_esp = $product->product_color_esp;
+        $product_color_esp = explode(',', $color_esp);
+        $size_en = $product->product_size_en;
+        $product_size_en = explode(',', $size_en);
+        $size_esp = $product->product_size_esp;
+        $product_size_esp = explode(',', $size_esp);
+        $multiImag = MultiImg::where('product_id',$id)->get();
+
+        $cat_id = $product->category_id;
+        $relatedProduct = Product::where([['category_id',$cat_id],['id','!=',$id]])->orderBy('id','DESC')->get();
+	 	return view('frontend.product.product_details',compact('product','multiImag','product_color_en','product_color_esp','product_size_en','product_size_esp','relatedProduct'));
+	}
+
+    public function TagWiseProduct($tag){
+		$products = Product::where([['status',1],['product_tags_en',$tag],['product_tags_esp',$tag]])->orderBy('id','DESC')->paginate(3);
+        $categories = Category::orderBy('category_name_en','ASC')->get();
+		return view('frontend.tags.tags_view',compact('products','categories'));
+	}
+
+    public function SubCatWiseProduct($subcat_id, $slug){
+        $products = Product::where([['status',1],['subcategory_id',$subcat_id]])->orderBy('id','DESC')->paginate(6);
+        $categories = Category::orderBy('category_name_en','ASC')->get();
+		return view('frontend.product.subcategory_view',compact('products','categories'));
+    }
+
+    public function SubSubCatWiseProduct($subsubcat_id, $slug){
+        $products = Product::where([['status',1],['subsubcategory_id',$subsubcat_id]])->orderBy('id','DESC')->paginate(6);
+        $categories = Category::orderBy('category_name_en','ASC')->get();
+		return view('frontend.product.sub_subcategory_view',compact('products','categories'));
+    }
+
+    /// Product View With Ajax
+	public function ProductViewAjax($id){
+        $product = Product::with('category','brand')->findOrFail($id);
+
+		/* $color = $product->product_color_en;
+		$product_color = explode(',', $color);
+
+		$size = $product->product_size_en;
+		$product_size = explode(',', $size); */
+
+        $color_en = $product->product_color_en;
+        $product_color_en = explode(',', $color_en);
+        $color_esp = $product->product_color_esp;
+        $product_color_esp = explode(',', $color_esp);
+        $size_en = $product->product_size_en;
+        $product_size_en = explode(',', $size_en);
+        $size_esp = $product->product_size_esp;
+        $product_size_esp = explode(',', $size_esp);
+
+		return response()->json(array(
+			'product' => $product,
+			'coloren' => $product_color_en,
+			'sizeen' => $product_size_en,
+            'coloresp' => $product_color_esp,
+			'sizeesp' => $product_size_esp,
+		));
+	} // end method
 }
